@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membrane Dynamics Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background-color: #f0f0f0;
+        }
+        #simulation-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        #simulationCanvas {
+            width: 70%;
+        }
+        #charts-container {
+            width: 30%;
+        }
+        canvas.chart {
+            width: 100%;
+            height: 250px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div id="simulation-container">
+    <canvas id="simulationCanvas"></canvas>
+    <div id="charts-container">
+        <canvas id="speedChart" class="chart"></canvas>
+        <canvas id="interactionChart" class="chart"></canvas>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simulationCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Initialize canvas size
+    canvas.width = 800;
+    canvas.height = 800;
+
+    // Simulation variables
+    const numLipids = 1000;
+    const numSteps = 2000;
+    const focalSize = 1;
+    const focalPos = [{x: 50, y: 50, prevX: 50, prevY: 50}];
+    const posLipids = Array.from({ length: numLipids }, () => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        prevX: Math.random() * 100,
+        prevY: Math.random() * 100
+    }));
+    let interactionVectors = Array(numLipids).fill({x: 0, y: 0});
+    let colors = Array(numLipids).fill('blue');
+    let speed = Array(numSteps).fill(0);
+    let avgSpeed = Array(numSteps).fill(0);
+    let interaction = Array(numSteps).fill(0);
+
+    // Create a function for random integer
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Initialize Chart.js charts
+    const speedChart = new Chart(document.getElementById('speedChart'), {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: numSteps }, (_, i) => i + 1),
+            datasets: [{
+                label: 'Average Speed',
+                data: avgSpeed,
+                borderColor: 'blue',
+                fill: false,
+                lineTension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Time (steps)' }},
+                y: { title: { display: true, text: 'Average Speed' }, min: 0, max: 1 }
+            }
+        }
+    });
+
+    const interactionChart = new Chart(document.getElementById('interactionChart'), {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: numSteps }, (_, i) => i + 1),
+            datasets: [{
+                label: 'Number of Interactions',
+                data: interaction,
+                borderColor: 'green',
+                fill: false,
+                lineTension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Time (steps)' }},
+                y: { title: { display: true, text: 'Number of Interactions' }, min: 0 }
+            }
+        }
+    });
+
+    // Main simulation loop
+    let step = 0;
+    function simulate() {
+        if (step >= numSteps) return;
+
+        // Update lipid positions
+        posLipids.forEach((lipid, i) => {
+            let lipidMovement = {x: lipid.x - lipid.prevX, y: lipid.y - lipid.prevY};
+            lipid.prevX = lipid.x;
+            lipid.prevY = lipid.y;
+            lipid.x += 0.5 * lipidMovement.x + randInt(-100, 100) / 300;
+            lipid.y += 0.5 * lipidMovement.y + randInt(-100, 100) / 300;
+            lipid.x = Math.max(Math.min(lipid.x, 100), 1);
+            lipid.y = Math.max(Math.min(lipid.y, 100), 1);
+        });
+
+        // Update focal particle and interactions
+        let numInteractions = 0;
+        posLipids.forEach((lipid, i) => {
+            const distance = Math.hypot(lipid.x - focalPos[0].x, lipid.y - focalPos[0].y);
+            const lipidDirection = {x: lipid.x - lipid.prevX, y: lipid.y - lipid.prevY};
+            const focalDirection = {x: focalPos[0].x - focalPos[0].prevX, y: focalPos[0].y - focalPos[0].prevY};
+            const cosTheta = (lipidDirection.x * focalDirection.x + lipidDirection.y * focalDirection.y) /
+                (Math.hypot(lipidDirection.x, lipidDirection.y) * Math.hypot(focalDirection.x, focalDirection.y));
+            const angle = Math.acos(cosTheta);
+            if (distance <= focalSize + 1 && distance >= focalSize - 1) {
+                colors[i] = 'green';
+                interactionVectors[i] = {x: lipid.x - lipid.prevX, y: lipid.y - lipid.prevY};
+                numInteractions++;
+            } else {
+                interactionVectors[i] = {x: 0, y: 0};
+                colors[i] = 'blue';
+            }
+        });
+
+        // Calculate force and update focal particle position
+        let force = {x: 0, y: 0};
+        interactionVectors.forEach(vec => {
+            force.x -= vec.x;
+            force.y -= vec.y;
+        });
+
+        let direction = {x: focalPos[0].x - focalPos[0].prevX, y: focalPos[0].y - focalPos[0].prevY};
+        const norm = Math.hypot(direction.x, direction.y);
+        direction = {x: direction.x / norm, y: direction.y / norm};
+
+        focalPos[0].prevX = focalPos[0].x;
+        focalPos[0].prevY = focalPos[0].y;
+        focalPos[0].x += 0.2 * force.x + 0.2 * direction.x;
+        focalPos[0].y += 0.2 * force.y + 0.2 * direction.y;
+
+        // Update speed and interaction data
+        if (step % 100 === 0) {
+            const distanceTraveled = Math.hypot(focalPos[0].x - focalPos[0].prevX, focalPos[0].y - focalPos[0].prevY);
+            speed.fill(distanceTraveled / 100, step, step + 100);
+        }
+        avgSpeed[step] = speed.slice(0, step + 1).reduce((a, b) => a + b) / (step + 1);
+        interaction[step] = numInteractions;
+
+        // Render the scene
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        posLipids.forEach((lipid, i) => {
+            ctx.beginPath();
+            ctx.arc(lipid.x * 8, lipid.y * 8, 2, 0, Math.PI * 2);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+        });
+
+        ctx.beginPath();
+        ctx.arc(focalPos[0].x * 8, focalPos[0].y * 8, focalSize * 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+
+        // Update the charts
+        speedChart.update();
+        interactionChart.update();
+
+        // Continue to the next step
+        step++;
+        requestAnimationFrame(simulate);
+    }
+
+    simulate();
+</script>
+
+</body>
+</html>
