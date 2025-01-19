@@ -6,6 +6,10 @@ num_steps = 2000;
 colors = repmat([0, 0, 1], num_lipids, 1);
 focal_size = 20;
 
+history_size = 20;
+focal_history = NaN(history_size, 2); % Buffer for past 10 positions
+history_idx = 1; % Index to track the current position in the buffer
+
 interaction_vectors = zeros(num_lipids,2);
 speed = NaN(num_steps, 1);
 avg_speed = NaN(num_steps,1);
@@ -69,8 +73,9 @@ hold off;
 
 for i = 1:num_steps
     for j = 1:num_lipids
+        lipid_movement = pos_lipids(j,3:4) - pos_lipids(j,1:2);
         pos_lipids(j, 1:2) = pos_lipids(j, 3:4); %store previous position
-        pos_lipids(j, 3:4) = pos_lipids(j, 1:2) + randi([-100 100], 1,2)/300;
+        pos_lipids(j, 3:4) = pos_lipids(j, 1:2) + 0.5*lipid_movement + randi([-100 100], 1,2)/300;
         pos_lipids(j,:) = max(min(pos_lipids(j,:), 100), 1);
     end
     % movement of focal particle
@@ -106,8 +111,18 @@ for i = 1:num_steps
     end
     focal_pos(1,1:2) = focal_pos(1,3:4);
     focal_pos(1,3:4) = focal_pos(1,1:2) + 0.2*force + 0.2* direction;
-    speed(i,1) = norm(focal_pos(3:4) - focal_pos(1:2));
+    focal_history(history_idx, :) = focal_pos(1, 3:4); % Store current position
+    history_idx = mod(history_idx, history_size) + 1; % Circular buffer index
+    speed(i,1) = norm(focal_pos(1,3:4) - focal_pos(1,1:2));
+
     avg_speed(i,1) = sum(speed(1:i,1))/i;
+    % 
+    % if i > history_size
+    %     speed(i,1) = norm(focal_history(i, :) - focal_history(history_size + 1,:))/history_size;
+    %     avg_speed(i,1) = sum(speed(history_size:i,1))/i;
+    % else
+    %     avg_speed(i,1) = 0;
+    % end
     interaction(i,1) = num_interactions;
     set(lipid_scatter, 'XData', pos_lipids(:,3), 'YData', pos_lipids(:,4), 'CData', colors)
     set(focal_scatter, 'XData', focal_pos(1,3), 'YData', focal_pos(1,4))
