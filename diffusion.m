@@ -4,10 +4,11 @@
 num_lipids = 1000;
 num_steps = 2000;
 colors = repmat([0, 0, 1], num_lipids, 1);
-focal_size = 5;
+focal_size = 20;
 
 interaction_vectors = zeros(num_lipids,2);
 speed = NaN(num_steps, 1);
+avg_speed = NaN(num_steps,1);
 interaction = NaN(num_steps,1);
 
 % create matrix for particle of interest 
@@ -52,7 +53,7 @@ xlabel('time')
 ylabel('Average Speed (distance traveled per simulation time step)')
 xlim([0 num_steps])
 ylim([0 1])
-speed_plot = plot(speed,'b', 'LineWidth',2);
+speed_plot = plot(avg_speed,'b', 'LineWidth',2);
 hold off;
 
 nexttile
@@ -61,7 +62,7 @@ xlabel('time')
 ylabel('Number of interaction_vectors')
 interaction_plot = plot(interaction);
 hold on;
-avg_interaction_plot = plot(avg_interaction_vectors);
+%avg_interaction_plot = plot(avg_interaction_vectors);
 hold off;
 
 % simulate movement
@@ -106,15 +107,19 @@ for i = 1:num_steps
     focal_pos(1,1:2) = focal_pos(1,3:4);
     focal_pos(1,3:4) = focal_pos(1,1:2) + 0.2*force + 0.2* direction;
     speed(i,1) = norm(focal_pos(3:4) - focal_pos(1:2));
+    avg_speed(i,1) = sum(speed(1:i,1))/i;
     interaction(i,1) = num_interactions;
     set(lipid_scatter, 'XData', pos_lipids(:,3), 'YData', pos_lipids(:,4), 'CData', colors)
     set(focal_scatter, 'XData', focal_pos(1,3), 'YData', focal_pos(1,4))
     circle_x = focal_size * cos(theta) + focal_pos(1,3);
     circle_y = focal_size * sin(theta) + focal_pos(1,4);
     set(circle_plot, 'XData', circle_x, 'YData', circle_y);
+    set(interaction_plot, 'YData', interaction)
+    set(speed_plot, 'YData', avg_speed)
     pause(0.01)
     drawnow;
 end
+
 
 
 
