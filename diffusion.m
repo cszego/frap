@@ -5,7 +5,7 @@ num_lipids = 2000;
 num_steps = 2000;
 focal_size = 5;
 
-function simulate_frap(num_lipids, num_steps, focal_size)
+function simulate(num_lipids, num_steps, focal_size)
 colors = repmat([0, 0, 1], num_lipids, 1);
 interaction_vectors = zeros(num_lipids,2);
 speed = zeros(num_steps, 1);
@@ -72,25 +72,26 @@ xlabel('Time')
 ylabel('Number of Interactions')
 title('Number of Interactions')
 xlim([0 num_steps])
-ylim([0 2*focal_size])
+ylim([0 40])
 interaction_plot = plot(interaction, 'Color', [0.75 0.75 0.75], 'LineWidth',1);
 hold on;
 avg_interaction_plot = plot(avg_num_interactions, 'r', 'LineWidth', 2);
+legend('Number of interactions', 'Average number of interactions')
 hold off;
 
-nexttile
-hold on;
-xlabel('Time')
-ylabel('Distance per Time Step')
-title('Average Speed')
-xlim([0 num_steps])
-ylim([0 1])
-speed_plot = plot(avg_speed,'b', 'LineWidth',2);
-hold off;
+% nexttile
+% hold on;
+% xlabel('Time')
+% ylabel('Distance per Time Step')
+% title('Average Speed')
+% xlim([0 num_steps])
+% ylim([0 1])
+% speed_plot = plot(avg_speed,'b', 'LineWidth',2);
+% hold off;
 
 
 
-nexttile
+nexttile(8)
 hold on;
 title('Max Distance Traveled')
 xlabel('Time')
@@ -105,15 +106,15 @@ intensity = NaN(1,num_steps+1);
 intensity(1:2) = 1;
 laserPressed = false;  % Initialize the flag to false
 
-nexttile
+nexttile(9)
 hold on;
-title('Qualitative Sample FRAP Curve')
+title('For Fun: Qualitative Sample FRAP Curve')
 xlabel('Time')
 ylabel('Relative Fluorescence')
 xlim([0 num_steps])
 ylim([0 1.5])
 intensity_plot = plot(intensity, 'k', 'LineWidth',2);
-uicontrol('Style', 'pushbutton', 'String', 'laser', ...
+uicontrol('Style', 'pushbutton', 'String', 'Push For Laser', ...
     'Position', [1500 150 100 40], 'Callback', @add_laser);
 hold off;
 
@@ -192,10 +193,11 @@ for i = 1:num_steps
     circle_y = focal_size * sin(theta) + focal_pos(1,4);
     set(circle_plot, 'XData', circle_x, 'YData', circle_y);
     set(interaction_plot, 'YData', interaction)
-    set(speed_plot, 'YData', avg_speed)
+    %set(speed_plot, 'YData', avg_speed)
     set(distance_plot, 'YData', max_distance)
     set(speed_over_steps_plot, 'YData', avg_speed_over_steps)
     set(avg_interaction_plot, 'YData', avg_num_interactions)
+   
      if laserPressed
         intensity(i+1) = 0;  % Set intensity to 0 for the current iteration
         laserPressed = false;  % Reset the flag after applying the change
@@ -213,5 +215,8 @@ function add_laser(~, ~)
     % Access the laserPressed variable and set it to true
     global laserPressed
     laserPressed = true;  % Set the flag to true when the button is pressed
+
 end
-simulate_frap(2000,2000,20)
+
+simulate(2000,1000,1)
+
