@@ -3,9 +3,10 @@
 
 num_lipids = 2000;
 num_steps = 2000;
-colors = repmat([0, 0, 1], num_lipids, 1);
 focal_size = 5;
 
+function simulate_frap(num_lipids, num_steps, focal_size)
+colors = repmat([0, 0, 1], num_lipids, 1);
 interaction_vectors = zeros(num_lipids,2);
 speed = zeros(num_steps, 1);
 avg_speed = NaN(num_steps,1);
@@ -39,7 +40,9 @@ for i = 1:num_lipids
 end
 % set up graphs
 
-figure;
+figure('units','normalized','outerposition',[0 0 1 1])
+layout = tiledlayout(3,3);
+nexttile(1,[2,2])
 hold on;
 lipid_scatter = scatter(pos_lipids(:,3), pos_lipids(:,4), 50, colors, 'filled');
 focal_scatter = scatter(focal_pos(:,3), focal_pos(:,4), focal_size, 'red', 'filled');
@@ -50,10 +53,31 @@ circle_plot = fill(circle_x, circle_y, [1, 0, 0], 'EdgeColor', 'none');
 xlim([0 100]);
 ylim([0 100]);
 axis equal
+axis off
 hold off;
 
-figure
-layout = tiledlayout(2,2);
+nexttile
+hold on;
+title('Average Speed Without Vibrations')
+xlabel('time')
+ylabel('Distance per Time Step')
+xlim([0 num_steps])
+ylim([0 10])
+speed_over_steps_plot = plot(avg_speed_over_steps, 'b', 'LineWidth', 2);
+hold off;
+
+nexttile
+hold on;
+xlabel('Time')
+ylabel('Number of Interactions')
+title('Number of Interactions')
+xlim([0 num_steps])
+ylim([0 2*focal_size])
+interaction_plot = plot(interaction, 'Color', [0.75 0.75 0.75], 'LineWidth',1);
+hold on;
+avg_interaction_plot = plot(avg_num_interactions, 'r', 'LineWidth', 2);
+hold off;
+
 nexttile
 hold on;
 xlabel('Time')
@@ -64,17 +88,7 @@ ylim([0 1])
 speed_plot = plot(avg_speed,'b', 'LineWidth',2);
 hold off;
 
-nexttile
-hold on;
-xlabel('Time')
-ylabel('Number of Interactions')
-title('Number of Interactions')
-xlim([0 num_steps])
-ylim([0 15])
-interaction_plot = plot(interaction, 'Color', [0.75 0.75 0.75], 'LineWidth',1);
-hold on;
-avg_interaction_plot = plot(avg_num_interactions, 'r', 'LineWidth', 2);
-hold off;
+
 
 nexttile
 hold on;
@@ -85,15 +99,24 @@ xlim([0 num_steps])
 distance_plot = plot(max_distance, 'b', LineWidth=2);
 hold off;
 
+global intensity  % Declare intensity as global
+global laserPressed  % Declare laserPressed as global flag
+intensity = NaN(1,num_steps+1);
+intensity(1:2) = 1;
+laserPressed = false;  % Initialize the flag to false
+
 nexttile
 hold on;
-title('Average Speed Without Vibrations')
-xlabel('time')
-ylabel('Average Speed')
+title('Qualitative Sample FRAP Curve')
+xlabel('Time')
+ylabel('Relative Fluorescence')
 xlim([0 num_steps])
-ylim([0 10])
-speed_over_steps_plot = plot(avg_speed_over_steps, 'b', 'LineWidth', 2);
+ylim([0 1.5])
+intensity_plot = plot(intensity, 'k', 'LineWidth',2);
+uicontrol('Style', 'pushbutton', 'String', 'laser', ...
+    'Position', [1500 150 100 40], 'Callback', @add_laser);
 hold off;
+
 % simulate movement
 focal_pos_init = focal_pos(1,3:4);
 focal_pos_minus_100 = focal_pos(1,3:4);
@@ -173,5 +196,22 @@ for i = 1:num_steps
     set(distance_plot, 'YData', max_distance)
     set(speed_over_steps_plot, 'YData', avg_speed_over_steps)
     set(avg_interaction_plot, 'YData', avg_num_interactions)
+     if laserPressed
+        intensity(i+1) = 0;  % Set intensity to 0 for the current iteration
+        laserPressed = false;  % Reset the flag after applying the change
+    else
+        % Apply the normal intensity update
+        intensity(i+1) = (1 - intensity(i))/(250/avg_speed_over_steps(i)) + intensity(i);
+    end
+    
+    set(intensity_plot, 'YData', intensity)
     drawnow;
 end
+end
+
+function add_laser(~, ~)
+    % Access the laserPressed variable and set it to true
+    global laserPressed
+    laserPressed = true;  % Set the flag to true when the button is pressed
+end
+simulate_frap(2000,2000,20)
