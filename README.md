@@ -2,6 +2,6 @@
 
 The videos show examples of the simulation running for different 'particle' sizes.
 
-<video width="320" height="240" autoplay>
-  <source src="large_particle.mp4" type="video/mp4">
-</video>
+[Small Particle](small_particle.mp4)
+[Medium Particle](medium_particle.mp4)
+[Large Particle](large_particle.mp4)
