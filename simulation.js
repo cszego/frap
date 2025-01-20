@@ -6,17 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const numSteps = 2000;
   const focalSize = 2;
 
-  // Initialize lipids with random positions
+  // Initialize lipids with random positions across the canvas
   const lipids = Array.from({ length: numLipids }, () => ({
-    pos: [Math.random() * 100, Math.random() * 100], // Random position within 100x100 canvas
-    prevPos: [Math.random() * 100, Math.random() * 100],
+    pos: [Math.random() * canvas.width, Math.random() * canvas.height], // Random position within canvas width and height
+    prevPos: [Math.random() * canvas.width, Math.random() * canvas.height],
     color: "blue",
   }));
 
   // Initialize focal particle
   let focal = {
-    pos: [50, 50], // Starting in the middle
-    prevPos: [50 + Math.random() * 0.1, 50 + Math.random() * 0.1],
+    pos: [canvas.width / 2, canvas.height / 2], // Starting in the middle
+    prevPos: [canvas.width / 2 + Math.random() * 0.1, canvas.height / 2 + Math.random() * 0.1],
     color: "red",
   };
 
@@ -52,8 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
       lipid.pos[1] += dy * 0.5 + (Math.random() - 0.5) / 3;
 
       // Constrain lipid positions to the canvas
-      lipid.pos[0] = Math.max(1, Math.min(100, lipid.pos[0]));
-      lipid.pos[1] = Math.max(1, Math.min(100, lipid.pos[1]));
+      lipid.pos[0] = Math.max(1, Math.min(canvas.width, lipid.pos[0]));
+      lipid.pos[1] = Math.max(1, Math.min(canvas.height, lipid.pos[1]));
 
       // Check interactions with focal point
       const dist = distance(lipid.pos, focal.pos);
@@ -90,8 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
     focal.pos[1] += forceCoefficient * force[1] + frictionCoefficient * normalizedDirection[1];
 
     // Constrain focal particle to the canvas
-    focal.pos[0] = Math.max(1, Math.min(100, focal.pos[0]));
-    focal.pos[1] = Math.max(1, Math.min(100, focal.pos[1]));
+    focal.pos[0] = Math.max(1, Math.min(canvas.width, focal.pos[0]));
+    focal.pos[1] = Math.max(1, Math.min(canvas.height, focal.pos[1]));
   }
 
   function render() {
@@ -99,13 +99,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render lipids
     lipids.forEach((lipid) => {
-      drawCircle(lipid.pos[0] * 8, lipid.pos[1] * 8, 5, lipid.color);
+      drawCircle(lipid.pos[0], lipid.pos[1], 5, lipid.color); // Adjusted drawing scale
     });
 
     // Render focal particle
-    drawCircle(focal.pos[0] * 8, focal.pos[1] * 8, focalSize * 8, focal.color);
+    drawCircle(focal.pos[0], focal.pos[1], focalSize, focal.color);
   }
 
+  // Simulation Loop
   function simulate() {
     updatePositions();
     render();
