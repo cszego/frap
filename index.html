@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membrane Dynamics Simulation</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="simulation.js" defer></script>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Membrane Dynamics Simulation</h1>
+  <canvas id="simulationCanvas" width="800" height="800"></canvas>
+  <div>
+    <h2>Plots</h2>
+    <svg id="avgSpeedPlot" width="400" height="300"></svg>
+    <svg id="interactionPlot" width="400" height="300"></svg>
+    <svg id="distancePlot" width="400" height="300"></svg>
+    <svg id="speedOverStepsPlot" width="400" height="300"></svg>
+  </div>
+</body>
+</html>
