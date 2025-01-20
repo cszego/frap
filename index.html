@@ -12,6 +12,8 @@
     <canvas id="simulationCanvas" width="600" height="600"></canvas>
     <script>
         const canvas = document.getElementById('simulationCanvas');
+        canvas.width = gridSize;
+        canvas.height = gridSize;
         const ctx = canvas.getContext('2d');
         const numLipids = 2000;
         const numSteps = 2000;
@@ -22,17 +24,22 @@
         let focalPos = {x: 50, y: 50, vx: 0, vy: 0}; // Focal particle initial position and velocity
         let colors = [];
         
-        // Initialize lipids with random positions within the grid (avoiding the edges)
+// Set up the grid size (100x100)
+const gridSize = 100;
+
+// Initialize lipid positions randomly within the grid (1 to 99 to avoid edges)
+const posLipids = [];
+const colors = [];
 for (let i = 0; i < numLipids; i++) {
-    // Generate random positions within a range (1 to 99) to avoid placing on the edges
-    posLipids.push({
-        x: Math.random() * 98 + 1,  // Random x between 1 and 99
-        y: Math.random() * 98 + 1,  // Random y between 1 and 99
-        vx: 0,
-        vy: 0
-    });
+    // Randomly set lipid positions between 1 and 99 (not including edges)
+    let x = Math.random() * (gridSize - 2) + 1;  // Between 1 and 99
+    let y = Math.random() * (gridSize - 2) + 1;  // Between 1 and 99
+    posLipids.push({ x: x, y: y, vx: 0, vy: 0 });
     colors.push('rgb(0, 0, 255)');  // Blue color for lipids
 }
+
+// Now, check if they are correctly distributed on the canvas
+console.log(posLipids);  // Log positions to check if they are in range
 
         // Update lipid positions
         function updateLipids() {
