@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GitHub Page</title>
+    <title>FRAP Sim</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,11 +11,6 @@
             padding: 0;
             text-align: center;
             background-color: #f4f4f4;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 1em 0;
         }
         .video-container {
             display: flex;
@@ -25,28 +20,28 @@
             padding: 1em;
         }
         video {
-            width: 300px;
-            height: 200px;
+            width: 600px;
+            height: 400px;
             border: none;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Welcome to My GitHub Page</h1>
+        <h1>Some dynamics of membrane components</h1>
     </header>
-    <p>This is a simple page with a header, some text, and three videos.</p>
+    <p>The videos show examples of the simulation for 'particles' of different sizes.</p>
     <div class="video-container">
         <video controls>
+            <source src="small_particle.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <video controls>
+            <source src="medium_particle.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <video controls>
             <source src="large_particle.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video controls>
-            <source src="video2.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video controls>
-            <source src="video3.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>
