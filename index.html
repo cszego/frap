@@ -1,26 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Membrane Dynamics Simulation</title>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script src="simulation.js" defer></script>
-  <style>
-    canvas {
-      border: 1px solid black;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membrane Dynamics Simulation</title>
+    <style>
+        canvas { display: block; margin: 0 auto; }
+    </style>
 </head>
 <body>
-  <h1>Membrane Dynamics Simulation</h1>
-  <canvas id="simulationCanvas" width="800" height="800"></canvas>
-  <div>
-    <h2>Plots</h2>
-    <svg id="avgSpeedPlot" width="400" height="300"></svg>
-    <svg id="interactionPlot" width="400" height="300"></svg>
-    <svg id="distancePlot" width="400" height="300"></svg>
-    <svg id="speedOverStepsPlot" width="400" height="300"></svg>
-  </div>
+    <canvas id="simulationCanvas" width="600" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const numLipids = 2000;
+        const numSteps = 2000;
+        const focalSize = 2;
+
+        // Arrays for lipids and focal particle
+        const posLipids = [];
+        let focalPos = {x: 50, y: 50, vx: 0, vy: 0}; // Focal particle initial position and velocity
+        let colors = [];
+        
+        // Initialize lipids
+        for (let i = 0; i < numLipids; i++) {
+            posLipids.push({x: Math.random() * 100, y: Math.random() * 100, vx: 0, vy: 0});
+            colors.push('rgb(0, 0, 255)');  // Blue color for lipids
+        }
+
+        // Update lipid positions
+        function updateLipids() {
+            for (let i = 0; i < numLipids; i++) {
+                let lipid = posLipids[i];
+                let lipidMovement = {x: lipid.x - lipid.vx, y: lipid.y - lipid.vy};
+                lipid.vx = lipid.x;
+                lipid.vy = lipid.y;
+                lipid.x = lipid.vx + 0.5 * lipidMovement.x + (Math.random() * 0.2 - 0.1);
+                lipid.y = lipid.vy + 0.5 * lipidMovement.y + (Math.random() * 0.2 - 0.1);
+
+                // Keep lipid within bounds
+                lipid.x = Math.max(1, Math.min(lipid.x, 100));
+                lipid.y = Math.max(1, Math.min(lipid.y, 100));
+            }
+        }
+
+        // Draw the lipids and focal particle
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw lipids
+            for (let i = 0; i < numLipids; i++) {
+                const lipid = posLipids[i];
+                ctx.beginPath();
+                ctx.arc(lipid.x * 6, lipid.y * 6, 2, 0, Math.PI * 2);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+            }
+
+            // Draw focal particle
+            ctx.beginPath();
+            ctx.arc(focalPos.x * 6, focalPos.y * 6, focalSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+        }
+
+        // Move focal particle based on interactions with lipids
+        function moveFocalParticle() {
+            let forceX = 0;
+            let forceY = 0;
+            let numInteractions = 0;
+
+            for (let i = 0; i < numLipids; i++) {
+                const lipid = posLipids[i];
+                let dx = lipid.x - focalPos.x;
+                let dy = lipid.y - focalPos.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Only interact if lipid is within focal particle interaction range
+                if (distance <= focalSize + 1 && distance >= focalSize - 1) {
+                    colors[i] = 'rgb(0, 255, 0)'; // Change lipid color to green on interaction
+                    forceX -= dx / distance;
+                    forceY -= dy / distance;
+                    numInteractions++; // Count interactions
+                } else {
+                    colors[i] = 'rgb(0, 0, 255)'; // Blue if not interacting
+                }
+            }
+
+            // Apply friction based on the number of interactions
+            const frictionCoefficient = numInteractions > 0 ? 0.1 * numInteractions : 0;
+            
+            // Move focal particle with force and apply friction
+            focalPos.vx += 0.1 * forceX;
+            focalPos.vy += 0.1 * forceY;
+
+            // Apply friction to slow down the focal particle
+            focalPos.vx *= (1 - frictionCoefficient);
+            focalPos.vy *= (1 - frictionCoefficient);
+
+            // Apply velocity to position
+            focalPos.x += focalPos.vx;
+            focalPos.y += focalPos.vy;
+
+            // Keep focal particle within bounds
+            if (focalPos.x < 1) focalPos.x = 1;
+            if (focalPos.x > 100) focalPos.x = 100;
+            if (focalPos.y < 1) focalPos.y = 1;
+            if (focalPos.y > 100) focalPos.y = 100;
+        }
+
+        // Simulate the movement for numSteps steps
+        let step = 0;
+        function simulate() {
+            if (step >= numSteps) return;
+
+            updateLipids();
+            moveFocalParticle();
+            draw();
+            step++;
+            requestAnimationFrame(simulate);
+        }
+
+        // Start the simulation
+        simulate();
+    </script>
 </body>
 </html>
