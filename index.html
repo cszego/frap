@@ -22,11 +22,17 @@
         let focalPos = {x: 50, y: 50, vx: 0, vy: 0}; // Focal particle initial position and velocity
         let colors = [];
         
-        // Initialize lipids
-        for (let i = 0; i < numLipids; i++) {
-            posLipids.push({x: Math.random() * 100, y: Math.random() * 100, vx: 0, vy: 0});
-            colors.push('rgb(0, 0, 255)');  // Blue color for lipids
-        }
+        // Initialize lipids with random positions within the grid (avoiding the edges)
+for (let i = 0; i < numLipids; i++) {
+    // Generate random positions within a range (1 to 99) to avoid placing on the edges
+    posLipids.push({
+        x: Math.random() * 98 + 1,  // Random x between 1 and 99
+        y: Math.random() * 98 + 1,  // Random y between 1 and 99
+        vx: 0,
+        vy: 0
+    });
+    colors.push('rgb(0, 0, 255)');  // Blue color for lipids
+}
 
         // Update lipid positions
         function updateLipids() {
