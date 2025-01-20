@@ -56,9 +56,8 @@ figure
 layout = tiledlayout(2,2);
 nexttile
 hold on;
-xlabel('Time')
-ylabel('Distance per Time Step')
-title('Average Speed')
+xlabel('time')
+ylabel('Average Speed (distance traveled per simulation time step)')
 xlim([0 num_steps])
 ylim([0 1])
 speed_plot = plot(avg_speed,'b', 'LineWidth',2);
@@ -66,33 +65,27 @@ hold off;
 
 nexttile
 hold on;
-xlabel('Time')
-ylabel('Number of Interactions')
-title('Number of Interactions')
-xlim([0 num_steps])
-ylim([0 15])
-interaction_plot = plot(interaction, 'Color', [0.75 0.75 0.75], 'LineWidth',1);
-hold on;
-avg_interaction_plot = plot(avg_num_interactions, 'r', 'LineWidth', 2);
-hold off;
-
-nexttile
-hold on;
-title('Max Distance Traveled')
-xlabel('Time')
-ylabel('Distance')
-xlim([0 num_steps])
-distance_plot = plot(max_distance, 'b', LineWidth=2);
-hold off;
-
-nexttile
-hold on;
-title('Average Speed Without Vibrations')
 xlabel('time')
-ylabel('Average Speed')
-xlim([0 num_steps])
-ylim([0 10])
-speed_over_steps_plot = plot(avg_speed_over_steps, 'b', 'LineWidth', 2);
+ylabel('Number of interaction_vectors')
+xlim[0 num_steps]
+ylim
+interaction_plot = plot(interaction);
+hold on;
+avg_interaction_plot = plot(avg_num_interactions);
+hold off;
+
+nexttile
+hold on;
+title('max distance traveled')
+xlabel('time')
+ylabel('max distance traveled')
+distance_plot = plot(max_distance);
+hold off;
+
+nexttile
+hold on;
+title('not considering vibrations')
+speed_over_steps_plot = plot(avg_speed_over_steps);
 hold off;
 % simulate movement
 focal_pos_init = focal_pos(1,3:4);
