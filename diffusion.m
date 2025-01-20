@@ -4,7 +4,7 @@
 num_lipids = 2000;
 num_steps = 2000;
 colors = repmat([0, 0, 1], num_lipids, 1);
-focal_size = 2;
+focal_size = 5;
 
 interaction_vectors = zeros(num_lipids,2);
 speed = zeros(num_steps, 1);
@@ -148,7 +148,7 @@ for i = 1:num_steps
     focal_pos(1,1:2) = focal_pos(1,3:4);
     friction_coefficient = 1/size(friction_lipids,1);
     friction_coefficient = friction_coefficient - 1;
-    focal_pos(1,3:4) = focal_pos(1,1:2) + (0.1*force + 0.3*direction) + friction_coefficient*(0.1* force + 0.3*direction)/2;
+    focal_pos(1,3:4) = focal_pos(1,1:2) + (0.1*force + 0.3*direction) + friction_coefficient*(0.1* force + 0.3*direction)/3;
     
     speed(i,1) = norm(focal_pos(1,3:4) - focal_pos(1,1:2));
     if mod(i-1, 20) == 0 % update speed after 100 steps (vibration and more constant movement treated differently)
@@ -162,6 +162,7 @@ for i = 1:num_steps
     max_distance(i,1) = max(distance_traveled);
     interaction(i,1) = num_interactions;
     avg_num_interactions(i,1) = sum(interaction(1:i))/i;
+    % update plots
     set(lipid_scatter, 'XData', pos_lipids(:,3), 'YData', pos_lipids(:,4), 'CData', colors)
     set(focal_scatter, 'XData', focal_pos(1,3), 'YData', focal_pos(1,4))
     circle_x = focal_size * cos(theta) + focal_pos(1,3);
