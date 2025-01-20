@@ -48,10 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const dx = lipid.pos[0] - lipid.prevPos[0];
       const dy = lipid.pos[1] - lipid.prevPos[1];
       lipid.prevPos = [...lipid.pos];
-      lipid.pos[0] += dx * 0.5 + (Math.random() - 0.5) / 3;
-      lipid.pos[1] += dy * 0.5 + (Math.random() - 0.5) / 3;
 
-      // Constrain lipid positions to the canvas
+      // Proper random walk: adding small random movements inside canvas bounds
+      lipid.pos[0] += dx * 0.5 + (Math.random() - 0.5) * 2; // Increase random movement factor
+      lipid.pos[1] += dy * 0.5 + (Math.random() - 0.5) * 2;
+
+      // Ensure lipid stays within the canvas boundaries
       lipid.pos[0] = Math.max(1, Math.min(canvas.width, lipid.pos[0]));
       lipid.pos[1] = Math.max(1, Math.min(canvas.height, lipid.pos[1]));
 
