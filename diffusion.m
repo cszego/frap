@@ -1,9 +1,13 @@
-% simulate membrane dynamics
-% initialize variables
+% simulate the effect of random interactions on a particle speed and
+% direction
 
-num_lipids = 2000;
-num_steps = 2000;
-focal_size = 5;
+%changeable parameters
+
+num_lipids = 2000; % how many small molecules
+num_steps = 2000; % how long should the simulation run
+focal_size = 5; % how big should the focal particle be (1 - 30)? 
+
+% initialize variables
 
 function simulate(num_lipids, num_steps, focal_size)
 colors = repmat([0, 0, 1], num_lipids, 1);
@@ -17,7 +21,6 @@ avg_speed_over_steps = NaN(num_steps,1);
 speed_over_steps = NaN(num_steps,1);
 avg_num_interactions = NaN(num_steps,1);
 
-friction_coefficient = 0;
 
 % create matrix for particle of interest 
 % store current and previous position
@@ -79,6 +82,7 @@ avg_interaction_plot = plot(avg_num_interactions, 'r', 'LineWidth', 2);
 legend('Number of interactions', 'Average number of interactions')
 hold off;
 
+% this figure not being used
 % nexttile
 % hold on;
 % xlabel('Time')
@@ -100,11 +104,11 @@ xlim([0 num_steps])
 distance_plot = plot(max_distance, 'b', LineWidth=2);
 hold off;
 
-global intensity  % Declare intensity as global
-global laserPressed  % Declare laserPressed as global flag
+global intensity  
+global laserPressed 
 intensity = NaN(1,num_steps+1);
 intensity(1:2) = 1;
-laserPressed = false;  % Initialize the flag to false
+laserPressed = false;
 
 nexttile(9)
 hold on;
@@ -152,8 +156,10 @@ for i = 1:num_steps
     end
     for l = 1:num_lipids
     distance = norm(pos_lipids(l,3:4) - focal_pos(1,3:4));
+    % for the lipids in the radius of interaction, the ones in the direct
+    % path of movement need to be pushed, applying a friction force
     if distance <= focal_size + 1 && distance >= focal_size - 1
-            focal_lipid_vector = focal_pos(1,3:4) - pos_lipids(l,3:4);
+            focal_lipid_vector = focal_pos(1,3:4) - pos_lipids(l,3:4); 
             focal_lipid_angle = acosd(dot(focal_lipid_vector, focal_direction)/(norm(focal_lipid_vector)*norm(focal_direction)));
             if focal_lipid_angle <= 90
                 friction_lipids = [friction_lipids; pos_lipids(l,3:4)];
@@ -193,16 +199,19 @@ for i = 1:num_steps
     circle_y = focal_size * sin(theta) + focal_pos(1,4);
     set(circle_plot, 'XData', circle_x, 'YData', circle_y);
     set(interaction_plot, 'YData', interaction)
-    %set(speed_plot, 'YData', avg_speed)
     set(distance_plot, 'YData', max_distance)
     set(speed_over_steps_plot, 'YData', avg_speed_over_steps)
     set(avg_interaction_plot, 'YData', avg_num_interactions)
+    %the next plot isn't being shown in the figure
+    %set(speed_plot, 'YData', avg_speed) 
+    
    
      if laserPressed
-        intensity(i+1) = 0;  % Set intensity to 0 for the current iteration
-        laserPressed = false;  % Reset the flag after applying the change
+        intensity(i+1) = 0; % sets intensity to 0 when clicked 
+        laserPressed = false;  % Reset after click
     else
-        % Apply the normal intensity update
+        % the further from pre-bleaching intensity levels, the quicker the
+        % recovery
         intensity(i+1) = (1 - intensity(i))/(250/avg_speed_over_steps(i)) + intensity(i);
     end
     
@@ -218,5 +227,5 @@ function add_laser(~, ~)
 
 end
 
-simulate(2000,1000,1)
+simulate(num_lipids,num_steps,focal_size)
 
