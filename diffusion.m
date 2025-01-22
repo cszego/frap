@@ -5,11 +5,12 @@
 
 num_lipids = 2000; % how many small molecules
 num_steps = 2000; % how long should the simulation run
-focal_size = 5; % how big should the focal particle be (1 - 30)? 
+focal_size = 1; % how big should the focal particle be (1 - 30)? 
+rigidity_coefficient = 3; % (1 - 5, with 5 being most rigid)
 
 % initialize variables
 
-function simulate(num_lipids, num_steps, focal_size)
+function simulate(num_lipids, num_steps, focal_size, rigidity_coefficient)
 colors = repmat([0, 0, 1], num_lipids, 1);
 interaction_vectors = zeros(num_lipids,2);
 speed = zeros(num_steps, 1);
@@ -130,7 +131,7 @@ for i = 1:num_steps
     for j = 1:num_lipids
         lipid_movement = pos_lipids(j,3:4) - pos_lipids(j,1:2);
         pos_lipids(j, 1:2) = pos_lipids(j, 3:4); %store previous position
-        pos_lipids(j, 3:4) = pos_lipids(j, 1:2) + 0.5*lipid_movement + randi([-100 100], 1,2)/300;
+        pos_lipids(j, 3:4) = pos_lipids(j, 1:2) + 0.5*lipid_movement + randi([-100 100], 1,2)/(rigidity_coefficient * 100);
         pos_lipids(j,:) = max(min(pos_lipids(j,:), 100), 1);
     end
     % movement of focal particle
@@ -178,6 +179,7 @@ for i = 1:num_steps
     focal_pos(1,1:2) = focal_pos(1,3:4);
     friction_coefficient = 1/size(friction_lipids,1);
     friction_coefficient = friction_coefficient - 1;
+    friction_coefficient = friction_coefficient * rigidity_coefficient / 3;
     focal_pos(1,3:4) = focal_pos(1,1:2) + (0.1*force + 0.3*direction) + friction_coefficient*(0.1* force + 0.3*direction)/3;
     
     speed(i,1) = norm(focal_pos(1,3:4) - focal_pos(1,1:2));
@@ -227,5 +229,5 @@ function add_laser(~, ~)
 
 end
 
-simulate(num_lipids,num_steps,focal_size)
+simulate(num_lipids,num_steps,focal_size, rigidity_coefficient)
 
