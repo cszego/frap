@@ -2,7 +2,7 @@
 
 The videos show examples of the simulation running for different 'particle' sizes. They can be viewed [here](https://cszego.github.io/membranesim/) or downloaded using the links below:
 
-[Small Particle]([small_particle.mp4](https://github.com/cszego/membranesim/raw/refs/heads/main/small_particle.mp4))
+[Small Particle](https://github.com/cszego/membranesim/raw/refs/heads/main/small_particle.mp4)
 
 [Medium Particle](https://github.com/cszego/membranesim/raw/refs/heads/main/medium_particle.mp4)
 
