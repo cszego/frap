@@ -7,11 +7,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
+            margin: 0 auto;
             padding: 0;
             text-align: center;
             background-color: #f4f4f4;
+
         }
+
         .video-container {
             display: flex;
             flex-wrap: wrap;
@@ -19,36 +21,106 @@
             gap: 1em;
             padding: 1em;
         }
+
         video {
             width: 1200px;
             height: 800px;
             border: none;
         }
+
+        figure {
+            margin: 1em auto;
+            text-align: center;
+        }
+
+        figcaption {
+            margin-top: 0.5em;
+            font-style: italic;
+            color: #555;
+        }
+
+        .info {
+            margin: 2em 0;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h2>Quick simulation of some membrane component dynamics</h2>
+        <h2>Simulation of Some Membrane Component Dynamics</h2>
     </header>
-    <p>Here are some examples of the simulation running for different 'particle' sizes. The simulation parameters can be changed using the original MATLAB code, found <a href = "https://github.com/cszego/membranesim">here.</a> <p> 
-    <p>The parameters plotted show the relationship between the number of interactions the particle experiences and its speed.</p>
-    <p>The final video is from <a href="https://www.science.org/doi/10.1126/sciadv.adk0217">this paper</a> and kinddd of resembles the simulation for a large particle.</p>
+    <div class="info">
+        <p>
+            Here are some examples of the simulation running for different particle sizes. 
+            The simulation parameters (membrane fluidity, particle size, and membrane density) can be changed using the original MATLAB code, found 
+            <a href="https://github.com/cszego/membranesim">here.</a>
+        </p>
+        <p>The parameters plotted show the relationship between the number of interactions the particle experiences and its speed.</p>
+        <p>Scroll through all of the videos below, or view side-by-side comparisons <a href="compare.html">here</a>.</p>
+    </div>
+
+    <!-- Video and Captions -->
     <div class="video-container">
-        <video autoplay = "autoplay" controls>
-            <source src="small_particle.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video autoplay = "autoplay" controls>
-            <source src="medium_particle.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video autoplay = "autoplay" controls>
-            <source src="large_particle.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video autoplay = "autoplay" controls>
-            <source src="illinois.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <figure>
+            <video autoplay controls>
+                <source src="small_particle_fluid (1).mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Small particle, high membrane fluidity</figcaption>
+        </figure>
+
+        <figure>
+            <video autoplay controls>
+                <source src="small_particle_rigid (1).mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Small particle, low membrane fluidity</figcaption>
+        </figure>
+
+        <figure>
+            <video autoplay controls>
+                <source src="medium_particle_fluid.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Medium particle, high membrane fluidity</figcaption>
+        </figure>
+
+        <figure>
+            <video autoplay controls>
+                <source src="medium_particle_rigid.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Medium particle, low membrane fluidity</figcaption>
+        </figure>
+
+        <figure>
+            <video autoplay controls>
+                <source src="large_particle_fluid.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Large particle, high membrane fluidity</figcaption>
+        </figure>
+
+        <figure>
+            <video autoplay controls>
+                <source src="large_particle_rigid.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <figcaption>Large particle, low membrane fluidity</figcaption>
+        </figure>
+    </div>
+
+    <div class="info">
+        <p>
+            This next video is from 
+            <a href="https://www.science.org/doi/10.1126/sciadv.adk0217">this paper</a> 
+            and shows the dynamics of lipid-protein interactions.
+        </p>
+        <figure>
+            <video autoplay controls>
+                <source src="illinois.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </figure>
+    </div>
 </body>
 </html>
